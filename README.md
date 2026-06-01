@@ -1,222 +1,76 @@
-# Discord OTP Bot
+# discord-otp-bot
 
-A powerful Discord bot that automatically retrieves OTP (One-Time Password) codes from your email and sends them directly to your Discord DMs. Perfect for developers, power users, and anyone who needs quick access to verification codes without switching between apps.
+Discord bot that checks your email over IMAP and DMs you OTP codes. I made this because I got tired of alt-tabbing to Gmail for 6-digit codes.
 
-![Discord](https://img.shields.io/badge/Discord-%235865F2.svg?style=for-the-badge&logo=discord&logoColor=white)
-![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54)
-![IMAP](https://img.shields.io/badge/IMAP-Email-orange?style=for-the-badge)
+Uses slash commands: `/otp`, `/quick_otp`, `/ping`. Gmail/Outlook/Yahoo/etc. as long as IMAP works.
 
----
+## setup
 
-## ✨ Features
+**You need:** Python 3.8+, a Discord bot token, email with IMAP on.
 
-- 🔍 **Automated OTP Detection** – Scans emails for verification codes
-- 📧 **Multi-Provider Support** – Works with Gmail, Outlook, Yahoo, and all IMAP email services
-- 🔒 **Secure & Private** – All OTP responses are ephemeral
-- ⚡ **Fast & Efficient** – Intelligent pattern matching
-- 🎯 **Slash Commands** – `/otp`, `/quick_otp`, `/ping`
-- 🛠️ **Environment-Based Setup**
-- 🔄 **Real-time New OTP Monitoring**
-
----
-
-## 🚀 Quick Start
-
-### Prerequisites
-- Python 3.8+
-- Discord server
-- Email with IMAP enabled
-
----
-
-## 📥 Installation
-
-### 1. Clone repository
 ```bash
-git clone https://github.com/2577mamneet/discord-otp-bot.git
+git clone https://github.com/2577manmeet/discord-otp-bot.git
 cd discord-otp-bot
-```
-
-### 2. Install dependencies
-```bash
 pip install -r requirements.txt
-```
-
-### 3. Configure environment variables
-```bash
 cp .env.example .env
 ```
 
-Inside `.env`:
+Fill in `.env`:
+
 ```env
-DISCORD_BOT_TOKEN=your_discord_bot_token_here
-EMAIL_ADDRESS=your_email@gmail.com
-EMAIL_PASSWORD=your_app_password_here
+DISCORD_BOT_TOKEN=your_token
+EMAIL_ADDRESS=you@gmail.com
+EMAIL_PASSWORD=your_app_password
 IMAP_SERVER=imap.gmail.com
 IMAP_PORT=993
 ```
 
----
+### discord side
 
-## 🤖 Discord Bot Setup
+1. [Developer Portal](https://discord.com/developers/applications) → New Application
+2. Bot tab → Add Bot → turn on **Message Content Intent**
+3. OAuth2 → URL Generator → scopes `bot` + `applications.commands`, invite to your server
 
-### Create a Discord Application
-1. Open **Discord Developer Portal**
-2. Click **New Application**
-3. Name it (e.g., OTP Bot)
+### gmail
 
-### Add Bot User
-1. Go to **Bot** tab  
-2. Click **Add Bot**  
-3. Enable **MESSAGE CONTENT INTENT**
+Turn on 2FA, then make an [App Password](https://myaccount.google.com/apppasswords) for Mail. Put that in `EMAIL_PASSWORD`, not your normal password.
 
-### Add Bot to Server
-1. Go to **OAuth2 → URL Generator**
-2. Scopes:
-   - `bot`
-   - `applications.commands`
-3. Permissions:
-   - View Channels
-   - Send Messages
-   - Read Message History
-   - Use Slash Commands
-
-Invite with generated URL.
-
----
-
-## 📧 Email Setup (Gmail Example)
-
-### Enable IMAP + App Password
-1. Enable **2-Step Verification**
-2. Go to **App Passwords**
-3. Choose "Mail"
-4. Generate password
-5. Paste into `.env`
-
----
-
-## ▶️ Running the Bot
+### run
 
 ```bash
 python otp_bot.py
 ```
 
-Expected log:
-```
-✅ Logged in as OTP Bot
-🔍 Loading slash commands...
-✅ Slash commands synced!
-🎯 Bot is ready!
-```
+Slash commands can take an hour or two to show up globally after first deploy. If the bot ignores you, re-invite with the right perms.
 
----
+## commands
 
-## 📖 Commands
+| command | what it does |
+|---------|----------------|
+| `/otp <email>` | scan inbox, up to ~2 min |
+| `/quick_otp <email>` | faster scan, ~1 min |
+| `/ping` | latency check |
 
-| Command | Description |
-|--------|-------------|
-| `/otp <email>` | Deep scan (up to 2 min) |
-| `/quick_otp <email>` | Quick scan (1 min) |
-| `/ping` | Check bot latency |
+OTP replies are ephemeral (only you see them).
 
-Example DM:
-```
-✅ OTP code found: 468450
-```
+## imap servers
 
----
-
-## 🛠️ Supported Email Providers
-
-| Provider | IMAP Server | Port |
-|---------|-------------|------|
+| provider | server | port |
+|----------|--------|------|
 | Gmail | imap.gmail.com | 993 |
 | Outlook | imap-mail.outlook.com | 993 |
 | Yahoo | imap.mail.yahoo.com | 993 |
 | iCloud | imap.mail.me.com | 993 |
-| AOL | imap.aol.com | 993 |
 
----
+## when stuff breaks
 
-## 🔧 Configuration Options
+- **no OTP** — check the email actually landed in inbox, try `/quick_otp`
+- **IMAP login fail** — app password wrong or IMAP disabled
+- **interaction failed** — double-check `.env`, Message Content Intent on
+- **commands missing** — wait for sync or re-invite bot
 
-| Variable | Description | Example |
-|----------|-------------|---------|
-| DISCORD_BOT_TOKEN | Discord bot token | abc123 |
-| EMAIL_ADDRESS | IMAP email address | your@gmail.com |
-| EMAIL_PASSWORD | App Password | abcd efgh ijkl mnop |
-| IMAP_SERVER | IMAP host | imap.gmail.com |
-| IMAP_PORT | IMAP port | 993 |
+Bot only reads mail, doesn't delete or send anything.
 
-### OTP Pattern Matching Supports:
-- “147477 is your instacart verification code”
-- Bolded: `**123456**`
-- “Your code is: 123456”
-- Any **4–8 digit numeric OTP**
+## license
 
----
-
-## 🛡️ Security
-
-- 🔐 Uses **secure app passwords**
-- 👁️ OTP sent only in **ephemeral DMs**
-- 📧 Bot is **read-only**, never modifies mail
-- 🔒 No saved data or logs containing sensitive info
-
----
-
-## ❓ Troubleshooting
-
-### Bot doesn’t reply
-- Wait 1–2 hours for global slash command sync  
-- Reinvite with correct permissions  
-
-### Interaction failed
-- Verify `.env`
-- Ensure Message Content Intent is enabled
-
-### No OTP found
-- Confirm email reached inbox  
-- Try `/quick_otp`
-
-### IMAP login issues
-- Ensure IMAP is enabled  
-- Regenerate app password  
-
-### Debug logs
-```
-🔍 Searching emails for: example@mail.com
-🔑 OTP found using pattern: 123456
-```
-
----
-
-## 🤝 Contributing
-
-1. Fork project  
-2. Create feature branch:
-```bash
-git checkout -b feature/YourFeature
-```
-3. Commit changes:
-```bash
-git commit -m "Add YourFeature"
-```
-4. Push:
-```bash
-git push origin feature/YourFeature
-```
-5. Submit PR
-
----
-
-## 📄 License
-This project is licensed under **MIT License**.
-
----
-
-## ⭐ Support
-If this project helps you, please **star ⭐ the repo**!
-
-> **Disclaimer:** Use this bot only with accounts you own.
+MIT. Only use this on accounts you own.
